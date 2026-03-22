@@ -125,14 +125,11 @@ public partial class MainWindow : Window
 
         try
         {
-            // Web-GUI Playlist Editor öffnen
-            var editorUrl = $"{_httpClient.BaseAddress.Scheme}://{_httpClient.BaseAddress.Host}:{_httpClient.BaseAddress.Port}/playout/editor";
-            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
-            {
-                FileName = editorUrl,
-                UseShellExecute = true
-            });
-            FileLogger.Log($"[MainWindow] Öffne Playlist Editor: {editorUrl}");
+            // Native WPF Playlist-Editor öffnen
+            var editor = new PlaylistEditorWindow(_httpClient, _httpClient.BaseAddress.ToString());
+            editor.Owner = this;
+            editor.ShowDialog();
+            FileLogger.Log("[MainWindow] Playlist Editor geschlossen");
         }
         catch (Exception ex)
         {
