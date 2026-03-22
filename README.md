@@ -51,13 +51,83 @@
   - (EN) local Windows app
 - Features: Status-Anzeige, Event-Liste, WebSocket-Verbindung  
   - (EN) status display, event log, websocket connection
+- Einstellungen: Menü → "Einstellungen" → Verbindungsdetails (Host/Port)  
+  - (EN) Settings: Menu → "Settings" → Connection details (host/port)
+
+## Konfiguration / Configuration
+
+### appsettings.json
+
+```json
+{
+  "PlayoutMode": "CasparCG",  // oder "OBS"
+  "CasparCG": {
+    "IP": "127.0.0.1",
+    "Port": 5250
+  },
+  "OBS": {
+    "IP": "127.0.0.1",
+    "Port": 4455,
+    "Password": ""
+  },
+  "PlaylistPath": "playlist.json",
+  "WebSocketPort": 8080,
+  "LoopEnabled": true,
+  "UseLocalMediaScanner": false,
+  "StreamerbotEnabled": false,
+  "Streamerbot": {
+    "IP": "127.0.0.1",
+    "Port": 8080,
+    "Password": ""
+  }
+}
+```
+
+### Streamer.bot Integration
+
+**Aktivierung:**
+- (DE) `"StreamerbotEnabled": true` in `appsettings.json`
+- (EN) Set `"StreamerbotEnabled": true` in `appsettings.json`
+
+**Authentifizierung (optional):**
+- Wenn Streamer.bot mit Passwort gesichert ist, setzen Sie das Passwort in `Streamerbot.Password`
+- (EN) If Streamer.bot is password-protected, set the password in `Streamerbot.Password`
+
+**WebSocket Server in Streamer.bot aktivieren:**
+1. Streamer.bot → Settings → WebSocket
+2. Enable WebSocket Server
+3. Port: (default 8080)
+4. Authentication: optional (empfohlen)
+
+**Verwendung:**
+- PlayoutServer.Core verbindet sich automatisch mit Streamer.bot
+- Streamer.bot-Events werden in Logs protokolliert
+- (EN) PlayoutServer.Core automatically connects to Streamer.bot
+- (EN) Streamer.bot events are logged
 
 ## Verbesserungen (MVP) / Improvements (MVP)
 
+- ✅ CasparCG Media Library via `LS` AMCP Command  
+  - (DE) direkt aus CasparCG-Server, keine lokalen Datei-Scans  
+  - (EN) directly from CasparCG server, no local file scans
+- ✅ Streamer.bot WebSocket Integration  
+  - (DE) Zwei-Wege-Kommunikation mit SHA256-basierter Authentifizierung  
+  - (EN) two-way communication with SHA256-based authentication
+- ✅ GUI Settings Panel  
+  - (DE) Host/Port-Einstellungen im WPF-Menü  
+  - (EN) Host/port settings in WPF menu
+- ✅ Separate Log-Dateien  
+  - (DE) `Logs/Log_core` und `Logs/Log_gui` mit Timestamp pro Session  
+  - (EN) `Logs/Log_core` and `Logs/Log_gui` with per-session timestamps
 - CasparCGProvider: Asynchrone Antwort-Verarbeitung via separaten Read-Task  
   - (EN) asynchronous response handling via a separate read task
 - Duration-basierte VideoEnded-Triggerung (Timer nach PLAY)  
   - (EN) duration-based video end trigger (timer after PLAY)
+- OBS-Provider-Implementierung (advanced)  
+  - (EN) OBS provider implementation (advanced)
+- FFmpeg-Integration für genaue Video-Dauer  
+  - (EN) FFmpeg integration for accurate video duration
+
 - WebSocket Broadcast für VIDEO_STARTED / VIDEO_ENDED  
   - (EN) websocket broadcast for VIDEO_STARTED / VIDEO_ENDED
 - Playlist-Loop mit zyklischem Abspielen  

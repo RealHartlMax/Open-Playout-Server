@@ -98,6 +98,7 @@ public partial class MainWindow : Window
         }
 
         _wsHost = string.IsNullOrWhiteSpace(HostTextBox.Text) ? "localhost" : HostTextBox.Text.Trim();
+        
         SettingsStatus.Text = $"Einstellungen gespeichert: {_wsHost}:{_wsPort}";
         FileLogger.Log(SettingsStatus.Text);
     }

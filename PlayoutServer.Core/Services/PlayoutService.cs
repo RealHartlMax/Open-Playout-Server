@@ -19,7 +19,7 @@ namespace PlayoutServer.Core.Services
     {
         private readonly WebSocketServer _wsServer;
         private readonly IHostApplicationLifetime _lifetime;
-        private MediaScanner? _mediaScanner;
+        private StreamerbotConnector? _streamerbot;
 
         public PlayoutService(WebSocketServer wsServer, IHostApplicationLifetime lifetime)
         {
@@ -70,6 +70,21 @@ namespace PlayoutServer.Core.Services
 
                 _wsServer.Start(config.WebSocketPort);
 
+                // Initialize Streamer.bot connector if enabled
+                if (config.StreamerbotEnabled)
+                {
+                    try
+                    {
+                        _streamerbot = new StreamerbotConnector(config.Streamerbot.IP, config.Streamerbot.Port, config.Streamerbot.Password);
+                        await _streamerbot.ConnectAsync().ConfigureAwait(false);
+                        FileLogger.Log("[PlayoutService] Streamer.bot connector initialized");
+                    }
+                    catch (Exception ex)
+                    {
+                        FileLogger.Log($"[PlayoutService] Streamer.bot connection failed: {ex.Message}");
+                    }
+                }
+
                 using var playlistManager = new PlaylistManager(provider, _wsServer, playlist);
                 playlistManager.SetLoop(config.LoopEnabled);
 
@@ -93,9 +108,10 @@ namespace PlayoutServer.Core.Services
                 catch (Exception ex)
                 {
                     FileLogger.Log($"MediaLibrary initial load failed from provider: {ex.Message}");
-                    if (_mediaScanner != null)
+                    if (config.UseLocalMediaScanner)
                     {
-                        var initialMedia = _mediaScanner.ScanMedia();
+                        var mediaScanner = new MediaScanner(config.MediaFolderPath);
+                        var initialMedia = mediaScanner.ScanMedia();
                         await _wsServer.BroadcastAsync(new { eventType = "MEDIA_LIBRARY_UPDATE", media = initialMedia }).ConfigureAwait(false);
                     }
                 }
@@ -186,6 +202,7 @@ namespace PlayoutServer.Core.Services
             catch (Exception ex)
             {
                 FileLogger.Log($"Fehler: {ex}");
+                _streamerbot?.Dispose();
                 _lifetime.StopApplication();
             }
         }

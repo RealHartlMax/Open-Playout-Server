@@ -47,6 +47,19 @@
                         <TextBlock Text="Port" Width="50" VerticalAlignment="Center" Foreground="White" />
                         <TextBox x:Name="PortTextBox" Width="150" Text="8080" />
                     </StackPanel>
+                    <TextBlock Text="Streamer.bot" FontWeight="Bold" Margin="0,12,0,6" Foreground="#88ccff" />
+                    <StackPanel Orientation="Horizontal" Margin="0,4">
+                        <TextBlock Text="Host" Width="50" VerticalAlignment="Center" Foreground="White" />
+                        <TextBox x:Name="StreamerbotHostTextBox" Width="150" Text="localhost" />
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="0,4">
+                        <TextBlock Text="Port" Width="50" VerticalAlignment="Center" Foreground="White" />
+                        <TextBox x:Name="StreamerbotPortTextBox" Width="150" Text="8080" />
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="0,4">
+                        <TextBlock Text="Pass" Width="50" VerticalAlignment="Center" Foreground="White" />
+                        <PasswordBox x:Name="StreamerbotPasswordBox" Width="150" />
+                    </StackPanel>
                     <Button Content="Speichern" Click="SaveSettings_Click" Margin="0,8,0,0" />
                     <TextBlock x:Name="SettingsStatus" Text="" Foreground="#88ff88" Margin="0,6,0,0"/>
                 </StackPanel>
