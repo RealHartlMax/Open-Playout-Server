@@ -59,7 +59,7 @@ namespace PlayoutServer.GUI {
                 return;
             }
             _contentLoaded = true;
-            System.Uri resourceLocater = new System.Uri("/PlayoutServer.GUI;component/playlisteditorwindow.xaml", System.UriKind.Relative);
+            System.Uri resourceLocater = new System.Uri("/PlayoutServer.GUI;V1.0.0.0;component/playlisteditorwindow.xaml", System.UriKind.Relative);
             
             #line 1 "..\..\..\PlaylistEditorWindow.xaml"
             System.Windows.Application.LoadComponent(this, resourceLocater);

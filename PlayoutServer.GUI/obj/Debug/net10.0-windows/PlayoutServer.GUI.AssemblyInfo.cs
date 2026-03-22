@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("PlayoutServer.GUI")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+5b7e0842f4fd16ed5fc06e2476991484834e504e")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+72a404a33a7f126ecdfcadc608e4d9ce635c93bb")]
 [assembly: System.Reflection.AssemblyProductAttribute("PlayoutServer.GUI")]
 [assembly: System.Reflection.AssemblyTitleAttribute("PlayoutServer.GUI")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

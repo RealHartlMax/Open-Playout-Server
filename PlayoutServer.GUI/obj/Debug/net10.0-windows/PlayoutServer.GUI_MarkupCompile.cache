@@ -1,5 +1,5 @@
 ﻿PlayoutServer.GUI
-
+1.0.0.0
 
 winexe
 C#
@@ -12,9 +12,9 @@ TRACE;DEBUG;NET;NET10_0;NETCOREAPP;WINDOWS;WINDOWS7_0;NET5_0_OR_GREATER;NET6_0_O
 D:\GitHub\Open-Playout-Server\PlayoutServer.GUI\App.xaml
 2269582958
 
-61848903617
+8-1406713099
 208-2039898290
 MainWindow.xaml;PlaylistEditorWindow.xaml;
 
-False
+True
 
