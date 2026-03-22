@@ -1,0 +1,48 @@
+[2026-03-22 18:06:46.543] [INFO] === GUI Logging started (2026-03-22 18:06:46) ===
+[2026-03-22 18:06:46.552] [INFO] GUI start
+[2026-03-22 18:06:48.962] [INFO] [REST-Client] Verbinde mit Core: http://localhost:5000
+[2026-03-22 18:06:50.200] [DEBUG] [REST-Status] Running=False, Index=0
+[2026-03-22 18:06:51.937] [DEBUG] [REST-Status] Running=False, Index=0
+[2026-03-22 18:06:53.941] [DEBUG] [REST-Status] Running=False, Index=0
+[2026-03-22 18:06:55.155] [INFO] [MainWindow] Öffne Playlist Editor: http://localhost:5000/playout/editor
+[2026-03-22 18:06:55.940] [DEBUG] [REST-Status] Running=False, Index=0
+[2026-03-22 18:06:57.945] [DEBUG] [REST-Status] Running=False, Index=0
+[2026-03-22 18:06:59.939] [DEBUG] [REST-Status] Running=False, Index=0
+[2026-03-22 18:07:01.933] [DEBUG] [REST-Status] Running=False, Index=0
+[2026-03-22 18:07:03.946] [DEBUG] [REST-Status] Running=False, Index=0
+[2026-03-22 18:07:05.939] [DEBUG] [REST-Status] Running=False, Index=0
+[2026-03-22 18:07:07.939] [DEBUG] [REST-Status] Running=False, Index=0
+[2026-03-22 18:07:09.934] [DEBUG] [REST-Status] Running=False, Index=0
+[2026-03-22 18:07:11.944] [DEBUG] [REST-Status] Running=False, Index=0
+[2026-03-22 18:07:13.945] [DEBUG] [REST-Status] Running=False, Index=0
+[2026-03-22 18:07:15.940] [DEBUG] [REST-Status] Running=False, Index=0
+[2026-03-22 18:07:17.937] [DEBUG] [REST-Status] Running=False, Index=0
+[2026-03-22 18:07:19.935] [DEBUG] [REST-Status] Running=False, Index=0
+[2026-03-22 18:07:21.949] [DEBUG] [REST-Status] Running=False, Index=0
+[2026-03-22 18:07:23.939] [DEBUG] [REST-Status] Running=False, Index=0
+[2026-03-22 18:07:25.946] [DEBUG] [REST-Status] Running=False, Index=0
+[2026-03-22 18:07:27.945] [DEBUG] [REST-Status] Running=False, Index=0
+[2026-03-22 18:07:29.960] [DEBUG] [REST-Status] Running=False, Index=0
+[2026-03-22 18:07:31.946] [DEBUG] [REST-Status] Running=False, Index=0
+[2026-03-22 18:07:33.932] [DEBUG] [REST-Status] Running=False, Index=0
+[2026-03-22 18:07:35.933] [DEBUG] [REST-Status] Running=False, Index=0
+[2026-03-22 18:07:37.937] [DEBUG] [REST-Status] Running=False, Index=0
+[2026-03-22 18:07:39.937] [DEBUG] [REST-Status] Running=False, Index=0
+[2026-03-22 18:07:41.935] [DEBUG] [REST-Status] Running=False, Index=0
+[2026-03-22 18:07:43.940] [DEBUG] [REST-Status] Running=False, Index=0
+[2026-03-22 18:07:45.944] [DEBUG] [REST-Status] Running=False, Index=0
+[2026-03-22 18:07:47.941] [DEBUG] [REST-Status] Running=False, Index=0
+[2026-03-22 18:07:49.944] [DEBUG] [REST-Status] Running=False, Index=0
+[2026-03-22 18:07:51.936] [DEBUG] [REST-Status] Running=False, Index=0
+[2026-03-22 18:07:53.942] [DEBUG] [REST-Status] Running=False, Index=0
+[2026-03-22 18:07:55.934] [DEBUG] [REST-Status] Running=False, Index=0
+[2026-03-22 18:07:57.942] [DEBUG] [REST-Status] Running=False, Index=0
+[2026-03-22 18:07:59.972] [DEBUG] [REST-Status] Running=False, Index=0
+[2026-03-22 18:08:01.938] [DEBUG] [REST-Status] Running=False, Index=0
+[2026-03-22 18:08:03.946] [DEBUG] [REST-Status] Running=False, Index=0
+[2026-03-22 18:08:05.934] [DEBUG] [REST-Status] Running=False, Index=0
+[2026-03-22 18:08:07.940] [DEBUG] [REST-Status] Running=False, Index=0
+[2026-03-22 18:08:09.944] [DEBUG] [REST-Status] Running=False, Index=0
+[2026-03-22 18:08:11.933] [DEBUG] [REST-Status] Running=False, Index=0
+[2026-03-22 18:08:13.945] [DEBUG] [REST-Status] Running=False, Index=0
+[2026-03-22 18:08:15.940] [DEBUG] [REST-Status] Running=False, Index=0

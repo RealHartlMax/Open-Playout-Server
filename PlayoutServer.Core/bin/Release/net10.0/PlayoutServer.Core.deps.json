@@ -1,0 +1,57 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v10.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v10.0": {
+      "PlayoutServer.Core/1.0.0": {
+        "dependencies": {
+          "Newtonsoft.Json": "13.0.4",
+          "WatsonWebsocket": "4.1.8"
+        },
+        "runtime": {
+          "PlayoutServer.Core.dll": {}
+        }
+      },
+      "Newtonsoft.Json/13.0.4": {
+        "runtime": {
+          "lib/net6.0/Newtonsoft.Json.dll": {
+            "assemblyVersion": "13.0.0.0",
+            "fileVersion": "13.0.4.30916"
+          }
+        }
+      },
+      "WatsonWebsocket/4.1.8": {
+        "runtime": {
+          "lib/net10.0/WatsonWebsocket.dll": {
+            "assemblyVersion": "4.1.8.0",
+            "fileVersion": "4.1.8.0"
+          }
+        }
+      }
+    }
+  },
+  "libraries": {
+    "PlayoutServer.Core/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Newtonsoft.Json/13.0.4": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-pdgNNMai3zv51W5aq268sujXUyx7SNdE2bj1wZcWjAQrKMFZV260lbqYop1d2GM67JI1huLRwxo9ZqnfF/lC6A==",
+      "path": "newtonsoft.json/13.0.4",
+      "hashPath": "newtonsoft.json.13.0.4.nupkg.sha512"
+    },
+    "WatsonWebsocket/4.1.8": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-kPPKVH7JP0Rb4aB1WEb0amrEkIUnMBNcvpzM+jJ3z4q2Zz9gEZYwHB40MzUY8FWWxW5iLhJVe9bt+YjBU9ICCg==",
+      "path": "watsonwebsocket/4.1.8",
+      "hashPath": "watsonwebsocket.4.1.8.nupkg.sha512"
+    }
+  }
+}

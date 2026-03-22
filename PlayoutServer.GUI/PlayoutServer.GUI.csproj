@@ -13,4 +13,10 @@
     <PackageReference Include="WatsonWebsocket" Version="4.1.8" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Page Remove="PlaylistEditorWindow_Fixed.xaml" />
+    <Compile Remove="PlaylistEditorWindow_Simple.xaml.cs" />
+    <Page Remove="PlaylistEditorWindow_Simple.xaml*" />
+  </ItemGroup>
+
 </Project>

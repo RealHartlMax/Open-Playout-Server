@@ -115,6 +115,32 @@ public partial class MainWindow : Window
     private async void StopButton_Click(object sender, RoutedEventArgs e) => await SendCommandAsync("stop");
     private async void SkipButton_Click(object sender, RoutedEventArgs e) => await SendCommandAsync("skip");
 
+    private void OpenPlaylistEditor_Click(object sender, RoutedEventArgs e)
+    {
+        if (!_isConnected || _httpClient.BaseAddress == null)
+        {
+            MessageBox.Show("Nicht verbunden. Bitte zuerst Verbindung herstellen.");
+            return;
+        }
+
+        try
+        {
+            // Web-GUI Playlist Editor öffnen
+            var editorUrl = $"{_httpClient.BaseAddress.Scheme}://{_httpClient.BaseAddress.Host}:{_httpClient.BaseAddress.Port}/playout/editor";
+            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+            {
+                FileName = editorUrl,
+                UseShellExecute = true
+            });
+            FileLogger.Log($"[MainWindow] Öffne Playlist Editor: {editorUrl}");
+        }
+        catch (Exception ex)
+        {
+            FileLogger.LogError("[MainWindow] Playlist Editor Error", ex);
+            MessageBox.Show($"Fehler beim Öffnen: {ex.Message}");
+        }
+    }
+
     private async Task SendCommandAsync(string command)
     {
         if (!_isConnected || _httpClient.BaseAddress == null)

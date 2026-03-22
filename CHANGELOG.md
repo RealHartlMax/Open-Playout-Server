@@ -7,6 +7,116 @@ und dieses Projekt folgt der [Semantic Versioning](https://semver.org/lang/de/).
 
 ---
 
+## [0.0.1c] - 2026-03-22
+
+**Playlist-Editor mit erweiterten Funktionen, Export/Import und Streamer.bot-Metadaten**
+
+### Added
+- **Erweiterte Playlist-Editor (Web-GUI)**
+  - Professionelle Toolbar mit: Exportieren, Importieren, Video hinzufügen, Entfernen
+  - Metadaten-Anzeige pro Video: Dateiname, Dauer (mm:ss), Status
+  - Drag & Drop für Playlist-Reordering
+  - Responsive Grid-Layout für Media-Auswahl
+  - Status-Feedback für Benutzer-Aktionen
+
+- **Export/Import-Funktionalen für Playlists**
+  - `GET /api/playout/exportplaylist?filename=custom.json` - Playlist als JSON mit custom Dateiname exportieren
+  - `POST /api/playout/importplaylist` - JSON-Datei hochladen und Playlist aktualisieren
+  - JavaScript-basierter File-Handling (Blob-Download, FileReader-Upload)
+  - Benutzerdefinierte Dateinamen möglich (z.B. "MyPlaylist_2026-03-22.json")
+  - Automatische Validierung von Import-Dateien
+
+- **Streamer.bot Metadaten-System (pro Video)**
+  - `POST /api/playout/video/{index}/streamerbotconfig` - Speichern von Streamer.bot-Konfiguration
+  - Configuration Modal im Editor für Metadaten-Eingabe
+  - StreamerbotConfig-Klasse mit: `SendToStreamerbot` (Bool), `MetadataToSend` (Dictionary)
+  - Optionale Felder: Title, Duration, Filename, CustomData
+
+- **Neue REST API Endpoints**
+  - `POST /api/playout/addmedia?filePath=media.mp4` - Video zur Playlist hinzufügen
+  - `POST /api/playout/deleteitem/{index}` - Video an Index entfernen
+  - `GET /api/playout/medialib` - Verfügbare Videos abrufen
+
+- **PlaylistItem-Modell erweitert**
+  - `StreamerbotConfig` Objekt mit Metadaten
+  - `MediaName` Property (formatierter Dateiname)
+  - Optional: `Thumbnail` URL für Video-Vorschau
+  - Persistierbar in Export-JSON
+
+- **JavaScript Event-Handler**
+  - `exportPlaylist()` - Triggert File-Download mit Prompt für Dateiname
+  - `importPlaylist(event)` - Liest JSON-Datei ein, parsed und aktualisiert Playlist
+  - `triggerImport()` - Öffnet File-Picker für Import
+  - `closeEditor()` - Schließt Editor-View
+  - `escapeHtml()` - Sanitization für sichere HTML-Rendering
+
+### Changed
+- **PlaylistEditor.cshtml**
+  - Neues Toolbar mit 4 Haupt-Buttons (Export, Import, Add, Remove)
+  - Improved renderPlaylist() für korrektes Auslesen aller Item-Properties
+  - Hidden File-Input für Import-Dialog
+  - Metadaten-Display: Zeigt FilePath, DurationSeconds, Status pro Video
+  - Status-Feedback-Bereich mit grüner Bestätigungsmeldung
+
+- **PlayoutController.cs**
+  - 5 neue Endpoints implementiert zur Playlist-Verwaltung
+  - Export erstellt JSON-Response mit Content-Disposition-Header
+  - Import akzeptiert JSON-Upload per FormData
+
+- **CSS Styling**
+  - Neue Klassen: `.toolbar`, `.toolbar-input`, `.btn-add`, `.btn-danger`
+  - Professionelle Button-Styling mit Farben und Icons
+  - Toolbar-Layout mit Flexbox für responsive Design
+
+### Fixed
+- **Metadaten-Laden-Bug**
+  - Korrekte API-Response-Verarbeitung bei Playlist-Abfrage
+  - Fehlerfreie Property-Extraktion aus PlaylistItem-Objekten
+  - Validierung von Playlist-Struktur vor Rendering
+
+- **File-Handling**
+  - Blob-basierter Download funktioniert korrektuell in allen Browsern
+  - FileReader-API für asynchrones Einlesen von Dateien
+  - Fehlertolerante JSON-Parsing mit try-catch
+
+- **Error Handling**
+  - Alert-basierte Fehlerausgabe für ungültige Import-Dateien
+  - Validierung: Erwartet JSON-Struktur `{ "playlist": [...] }`
+  - Status-Feedback bei erfolgreicher Import/Export
+
+### Known Limitations
+- Thumbnails noch als Placeholders implementiert (CasparCG-Integration ausstehend)
+- Media-Library-Endpoint liefert noch Dummy-Daten
+- Streamer.bot-Metadaten werden noch nicht automatisch übertragen
+- Keine Persistierung der Config zwischen Neustarts (in-Memory nur)
+
+### Technical Details
+- **Export-JSON Format:**
+  ```json
+  {
+    "playlist": [
+      {
+        "filePath": "video.mp4",
+        "durationSeconds": 120,
+        "enabled": true,
+        "status": "Ready",
+        "streamerbotConfig": {
+          "sendToStreamerbot": true,
+          "metadataToSend": {"title": "My Video"}
+        }
+      }
+    ]
+  }
+  ```
+
+- **API Lifecycle:**
+  - Export: GET `/api/playout/exportplaylist?filename=custom.json` → FileStream (application/json)
+  - Import: POST `/api/playout/importplaylist` → JSON Body → PlaylistManager.UpdatePlaylistFromJson()
+  - Add: POST `/api/playout/addmedia?filePath=...` → PlaylistManager.AddItem()
+  - Delete: POST `/api/playout/deleteitem/{index}` → PlaylistManager.RemoveItem()
+
+---
+
 ## [0.0.1b] - 2026-03-22
 
 **Hybrid-Architektur: REST API + Streamer.bot Integration**

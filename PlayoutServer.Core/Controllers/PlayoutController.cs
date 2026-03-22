@@ -195,5 +195,163 @@ namespace PlayoutServer.Core.Controllers
                 streambotConnected = _streamerbot != null
             });
         }
+
+        /// <summary>POST /api/playout/addmedia - Fügt Media-Item zur Playlist hinzu</summary>
+        [HttpPost("addmedia")]
+        public IActionResult AddMedia([FromBody] dynamic request)
+        {
+            if (_playlistManager == null)
+                return BadRequest("PlayoutManager nicht initialisiert");
+
+            try
+            {
+                string? filePath = request?.filePath;
+                if (string.IsNullOrEmpty(filePath))
+                    return BadRequest("filePath erforderlich");
+
+                var item = new PlaylistItem
+                {
+                    FilePath = filePath,
+                    DurationSeconds = (int?)request?.duration ?? 0,
+                    Status = "queued"
+                };
+
+                _playlistManager.AddItem(item);
+                FileLogger.Log($"[REST-API] Media hinzugefügt: {filePath}");
+                return Ok(new { message = "Media hinzugefügt", item = item });
+            }
+            catch (Exception ex)
+            {
+                FileLogger.LogError("[REST-API] AddMedia-Fehler", ex);
+                return StatusCode(500, new { error = ex.Message });
+            }
+        }
+
+        /// <summary>DELETE /api/playout/playlist/{index} - Entfernt Item</summary>
+        [HttpDelete("playlist/{index}")]
+        public IActionResult RemovePlaylistItem(int index)
+        {
+            if (_playlistManager == null)
+                return BadRequest("PlayoutManager nicht initialisiert");
+
+            try
+            {
+                var playlist = _playlistManager.GetPlaylist();
+                if (index < 0 || index >= playlist.Count)
+                    return BadRequest("Ungültiger Index");
+
+                var item = playlist[index];
+                _playlistManager.RemoveItem(index);
+                FileLogger.Log($"[REST-API] Item entfernt: Index {index}");
+                return Ok(new { message = "Item entfernt", removed = item });
+            }
+            catch (Exception ex)
+            {
+                FileLogger.LogError("[REST-API] RemoveItem-Fehler", ex);
+                return StatusCode(500, new { error = ex.Message });
+            }
+        }
+
+        /// <summary>POST /api/playout/video/{index}/streamerbotconfig - Speichert Streamer.bot-Konfiguration</summary>
+        [HttpPost("video/{index}/streamerbotconfig")]
+        public IActionResult SaveStreamerbotConfig(int index, [FromBody] dynamic config)
+        {
+            if (_playlistManager == null)
+                return BadRequest("PlayoutManager nicht initialisiert");
+
+            try
+            {
+                var playlist = _playlistManager.GetPlaylist();
+                if (index < 0 || index >= playlist.Count)
+                    return BadRequest("Ungültiger Index");
+
+                var item = playlist[index];
+                item.SendToStreamerbot = config?.enabled ?? false;
+                
+                // Speichere Metadaten (Custom-Properties für Streamer.bot)
+                if (config?.metadata != null)
+                {
+                    item.StreamerbotMetadata.Clear();
+                    foreach (var prop in config.metadata)
+                    {
+                        item.StreamerbotMetadata[prop.Name] = prop.Value;
+                    }
+                }
+
+                item.LastUpdated = DateTime.Now.ToString("O");
+                _playlistManager.UpdateItem(index, item);
+                
+                FileLogger.Log($"[REST-API] Streamer.bot-Config gespeichert für Index {index}");
+                return Ok(new { message = "Config gespeichert", item = item });
+            }
+            catch (Exception ex)
+            {
+                FileLogger.LogError("[REST-API] SaveStreamerbotConfig-Fehler", ex);
+                return StatusCode(500, new { error = ex.Message });
+            }
+        }
+
+        /// <summary>GET /api/playout/playlist/export - Exportiert Playlist als JSON</summary>
+        [HttpGet("playlist/export")]
+        public IActionResult ExportPlaylist()
+        {
+            if (_playlistManager == null)
+                return BadRequest("PlayoutManager nicht initialisiert");
+
+            try
+            {
+                var playlist = _playlistManager.GetPlaylist();
+                var fileName = $"playlist_{DateTime.Now:yyyy-MM-dd_HH-mm-ss}.json";
+                
+                FileLogger.Log($"[REST-API] Playlist exportiert: {fileName}");
+                return Ok(new 
+                { 
+                    fileName = fileName,
+                    playlist = playlist,
+                    exportedAt = DateTime.Now
+                });
+            }
+            catch (Exception ex)
+            {
+                FileLogger.LogError("[REST-API] ExportPlaylist-Fehler", ex);
+                return StatusCode(500, new { error = ex.Message });
+            }
+        }
+
+        /// <summary>POST /api/playout/playlist/import - Importiert Playlist aus JSON</summary>
+        [HttpPost("playlist/import")]
+        public IActionResult ImportPlaylist([FromBody] dynamic data)
+        {
+            if (_playlistManager == null)
+                return BadRequest("PlayoutManager nicht initialisiert");
+
+            try
+            {
+                if (data?.playlist == null)
+                    return BadRequest("Playlist-Daten erforderlich");
+
+                var items = new List<PlaylistItem>();
+                foreach (var itemData in data.playlist)
+                {
+                    var item = new PlaylistItem
+                    {
+                        FilePath = itemData.filePath ?? itemData.FilePath ?? "",
+                        DurationSeconds = (int?)itemData.durationSeconds ?? (int?)itemData.DurationSeconds ?? 0,
+                        Enabled = (bool?)itemData.enabled ?? (bool?)itemData.Enabled ?? true,
+                        Status = itemData.status ?? itemData.Status ?? "queued"
+                    };
+                    items.Add(item);
+                }
+
+                _playlistManager.UpdatePlaylist(items);
+                FileLogger.Log($"[REST-API] Playlist importiert: {items.Count} Items");
+                return Ok(new { message = "Playlist importiert", itemCount = items.Count });
+            }
+            catch (Exception ex)
+            {
+                FileLogger.LogError("[REST-API] ImportPlaylist-Fehler", ex);
+                return StatusCode(500, new { error = ex.Message });
+            }
+        }
     }
 }

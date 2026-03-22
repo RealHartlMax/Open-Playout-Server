@@ -26,6 +26,7 @@
             <Button Content="▶ Play" Click="PlayButton_Click" Margin="10,0"/>
             <Button Content="■ Stop" Click="StopButton_Click" Margin="10,0"/>
             <Button Content="⏭ Next" Click="SkipButton_Click" Margin="10,0"/>
+            <Button Content="📋 Playlist" Click="OpenPlaylistEditor_Click" Margin="10,0" Background="#7c3aed" Foreground="White"/>
         </StackPanel>
 
         <Grid Grid.Row="2" Margin="10">

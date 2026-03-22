@@ -1,0 +1,27 @@
+[2026-03-22 17:44:59.001] [INFO] === Logging started for core (2026-03-22 17:44:58) ===
+[2026-03-22 17:44:59.017] [INFO] Program start
+[2026-03-22 17:44:59.381] [INFO] Lade Playlist von playlist.json
+[2026-03-22 17:44:59.458] [INFO] Gefundene Anzahl Playlisteinträge: 2
+[2026-03-22 17:44:59.472] [INFO] [PlayoutService] WebSocket Server nicht gestartet - nur Streamer.bot als Client Mode
+[2026-03-22 17:44:59.642] [INFO] [CasparCG] LS report returned 0 entries
+[2026-03-22 17:45:31.667] [INFO] [REST-API] Play-Befehl empfangen
+[2026-03-22 17:45:31.678] [INFO] Playlist start requested
+[2026-03-22 17:45:31.689] [INFO] [CasparCG] Play-Befehl gesendet: video1
+[2026-03-22 17:45:31.721] [INFO] [CasparCG] Antwort: 202 PLAY OK
+[2026-03-22 17:46:01.737] [INFO] [CasparCG] Play-Befehl gesendet: video2
+[2026-03-22 17:46:01.747] [INFO] [CasparCG] Antwort: 202 PLAY OK
+[2026-03-22 17:46:46.765] [INFO] [CasparCG] Play-Befehl gesendet: video1
+[2026-03-22 17:46:46.785] [INFO] [CasparCG] Antwort: 202 PLAY OK
+[2026-03-22 17:47:16.825] [INFO] [CasparCG] Play-Befehl gesendet: video2
+[2026-03-22 17:47:16.835] [INFO] [CasparCG] Antwort: 202 PLAY OK
+[2026-03-22 17:47:17.346] [INFO] [REST-API] Skip-Befehl empfangen
+[2026-03-22 17:47:17.363] [INFO] [CasparCG] Stop-Befehl gesendet
+[2026-03-22 17:47:17.373] [INFO] [CasparCG] Play-Befehl gesendet: video1
+[2026-03-22 17:47:17.384] [INFO] [CasparCG] Antwort: 202 STOP OK
+[2026-03-22 17:47:22.033] [INFO] [REST-API] Skip-Befehl empfangen
+[2026-03-22 17:47:22.093] [INFO] [CasparCG] Stop-Befehl gesendet
+[2026-03-22 17:47:22.108] [INFO] [CasparCG] Play-Befehl gesendet: video2
+[2026-03-22 17:47:22.151] [INFO] [CasparCG] Antwort: 202 STOP OK
+[2026-03-22 17:47:25.329] [INFO] [REST-API] Stop-Befehl empfangen
+[2026-03-22 17:47:25.343] [INFO] Playlist stop requested
+[2026-03-22 17:47:25.354] [INFO] [CasparCG] Stop-Befehl gesendet

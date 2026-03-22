@@ -267,6 +267,52 @@ namespace PlayoutServer.Core.Services
             });
         }
 
+        /// <summary>
+        /// Fügt ein Element zur Playlist hinzu
+        /// </summary>
+        public void AddItem(PlaylistItem item)
+        {
+            lock (_lock)
+            {
+                _playlist.Add(item);
+                FileLogger.Log($"[PlaylistManager] Item hinzugefügt: {item.MediaName}");
+            }
+            BroadcastPlaylistAsync().ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Entfernt ein Element aus der Playlist
+        /// </summary>
+        public void RemoveItem(int index)
+        {
+            lock (_lock)
+            {
+                if (index >= 0 && index < _playlist.Count)
+                {
+                    var removed = _playlist[index];
+                    _playlist.RemoveAt(index);
+                    FileLogger.Log($"[PlaylistManager] Item entfernt: {removed.MediaName}");
+                }
+            }
+            BroadcastPlaylistAsync().ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Aktualisiert ein Element in der Playlist
+        /// </summary>
+        public void UpdateItem(int index, PlaylistItem item)
+        {
+            lock (_lock)
+            {
+                if (index >= 0 && index < _playlist.Count)
+                {
+                    _playlist[index] = item;
+                    FileLogger.Log($"[PlaylistManager] Item aktualisiert: {item.MediaName}");
+                }
+            }
+            BroadcastPlaylistAsync().ConfigureAwait(false);
+        }
+
         public void Dispose()
         {
             StopProgressLoop();

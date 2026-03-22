@@ -1,0 +1,8 @@
+[2026-03-22 18:03:05.802] [INFO] === Logging started for core (2026-03-22 18:03:05) ===
+[2026-03-22 18:03:05.812] [INFO] Program start
+[2026-03-22 18:03:06.220] [INFO] Lade Playlist von playlist.json
+[2026-03-22 18:03:06.237] [INFO] Gefundene Anzahl Playlisteinträge: 2
+[2026-03-22 18:03:06.248] [INFO] [PlayoutService] WebSocket Server nicht gestartet - nur Streamer.bot als Client Mode
+[2026-03-22 18:03:06.385] [INFO] [CasparCG] LS report returned 0 entries
+[2026-03-22 18:03:06.397] [INFO] Fehler: System.Threading.Tasks.TaskCanceledException: A task was canceled.
+   at PlayoutServer.Core.Services.PlayoutService.ExecuteAsync(CancellationToken stoppingToken) in D:\GitHub\Open-Playout-Server\PlayoutServer.Core\Services\PlayoutService.cs:line 213

@@ -1,0 +1,778 @@
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Playlist Editor - PlayoutServer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            color: #e2e8f0;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: #1f2937;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            max-height: 90vh;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+            padding: 20px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+
+        .toolbar {
+            background: #111827;
+            padding: 15px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            border-bottom: 1px solid #334155;
+            flex-shrink: 0;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .btn-add {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn-add:hover {
+            background: #059669;
+            transform: scale(1.05);
+        }
+
+        .btn-export {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .btn-export:hover {
+            background: #2563eb;
+            transform: scale(1.05);
+        }
+
+        .btn-import {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .btn-import:hover {
+            background: #d97706;
+            transform: scale(1.05);
+        }
+
+        .content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .media-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .media-selector {
+            background: #334155;
+            border-radius: 8px;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.2s ease;
+        }
+
+        .media-selector:hover {
+            border-color: #7c3aed;
+            background: #475569;
+        }
+
+        .media-selector img {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 4px;
+            background: #1e293b;
+        }
+
+        .media-selector-name {
+            font-size: 12px;
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .media-selector-duration {
+            font-size: 10px;
+            opacity: 0.7;
+        }
+
+        .playlist-list {
+            list-style: none;
+        }
+
+        .playlist-item {
+            background: #334155;
+            padding: 15px;
+            margin-bottom: 8px;
+            border-radius: 8px;
+            display: grid;
+            grid-template-columns: 80px 1fr auto;
+            gap: 15px;
+            align-items: center;
+            cursor: move;
+            transition: all 0.2s ease;
+            border-left: 4px solid #7c3aed;
+            position: relative;
+        }
+
+        .playlist-item:hover {
+            background: #475569;
+            transform: translateX(4px);
+        }
+
+        .playlist-item-thumbnail {
+            width: 80px;
+            height: 60px;
+            background: #1e293b;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .playlist-item-thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .playlist-item-info {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .playlist-item-info h3 {
+            font-size: 14px;
+            margin-bottom: 0;
+        }
+
+        .playlist-item-meta {
+            display: flex;
+            gap: 20px;
+            font-size: 11px;
+            opacity: 0.75;
+        }
+
+        .playlist-item-actions {
+            display: flex;
+            gap: 6px;
+        }
+
+        .btn-delete {
+            background: #dc2626;
+            color: white;
+            padding: 6px 10px;
+        }
+
+        .btn-delete:hover {
+            background: #b91c1c;
+        }
+
+        .btn-config {
+            background: #2563eb;
+            color: white;
+            padding: 6px 10px;
+        }
+
+        .btn-config:hover {
+            background: #1d4ed8;
+        }
+
+        .btn-up {
+            background: #2563eb;
+            color: white;
+            padding: 6px 10px;
+        }
+
+        .btn-down {
+            background: #2563eb;
+            color: white;
+            padding: 6px 10px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: #1f2937;
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #7c3aed;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 8px;
+            background: #334155;
+            border: 1px solid #475569;
+            border-radius: 4px;
+            color: #e2e8f0;
+            font-size: 12px;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: auto;
+            margin: 0;
+        }
+
+        .metadata-list {
+            background: #111827;
+            border-radius: 4px;
+            padding: 10px;
+            max-height: 200px;
+            overflow-y: auto;
+            margin: 10px 0;
+        }
+
+        .metadata-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px;
+            background: #1e293b;
+            border-radius: 4px;
+            margin-bottom: 5px;
+            font-size: 11px;
+        }
+
+        .footer {
+            background: #111827;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            flex-shrink: 0;
+            border-top: 1px solid #334155;
+        }
+
+        .btn-primary {
+            background: #16a34a;
+            color: white;
+            padding: 10px 20px;
+            flex: 1;
+        }
+
+        .btn-primary:hover {
+            background: #15803d;
+        }
+
+        .btn-secondary {
+            background: #475569;
+            color: white;
+            padding: 10px 20px;
+            flex: 1;
+        }
+
+        .btn-secondary:hover {
+            background: #64748b;
+        }
+
+        .btn-modal-close {
+            background: #475569;
+            color: white;
+            padding: 8px 16px;
+            width: 100%;
+            margin-top: 15px;
+        }
+
+        .status {
+            text-align: center;
+            padding: 10px;
+            font-size: 12px;
+            opacity: 0.7;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #94a3b8;
+        }
+
+        .empty-state p {
+            font-size: 14px;
+        }
+
+        .dragging {
+            opacity: 0.5;
+            background: #1e293b !important;
+        }
+
+        .drag-over {
+            border-top: 3px solid #7c3aed;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📋 Playlist Editor</h1>
+            <p>Drag & Drop zum Reordnen, Hinzufügen/Löschen von Videos</p>
+        </div>
+
+        <div class="toolbar">
+            <button class="btn btn-add" onclick="openMediaSelector()">➕ Video hinzufügen</button>
+            <button class="btn btn-export" onclick="exportPlaylist()">💾 Exportieren</button>
+            <button class="btn btn-import" onclick="triggerImport()">📂 Importieren</button>
+            <input type="file" id="importFile" accept=".json" style="display: none;" onchange="importPlaylist(event)">
+            <div style="flex: 1;"></div>
+            <span class="status" id="toolbarStatus"></span>
+        </div>
+
+        <div class="content">
+            <div id="mediaSelector" class="media-grid" style="display: none; margin-bottom: 30px; padding: 20px; background: #111827; border-radius: 8px;">
+                <h3 style="grid-column: 1/-1; margin-bottom: 15px;">Verfügbare Medien</h3>
+                <div id="mediaGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; grid-column: 1/-1;"></div>
+                <button class="btn btn-secondary" onclick="closeMediaSelector()" style="grid-column: 1/-1; margin-top: 10px;">Abbrechen</button>
+            </div>
+
+            <div id="status" class="status" style="display: none;">Playlist wird geladen...</div>
+            <ul id="playlistList" class="playlist-list"></ul>
+            <div id="emptyState" class="empty-state" style="display: none;">
+                <p>👀 Keine Videos in der Playlist</p>
+                <p style="font-size: 12px; margin-top: 10px;">Verwende "Video hinzufügen" um Videos hinzuzufügen</p>
+            </div>
+        </div>
+
+        <div class="footer">
+            <button class="btn btn-secondary" onclick="closeEditor()">Abbrechen</button>
+            <button class="btn btn-primary" onclick="savePlaylist()">✓ Speichern</button>
+        </div>
+    </div>
+
+    <!-- Modal für Streamer.bot-Konfiguration -->
+    <div class="modal" id="configModal">
+        <div class="modal-content">
+            <div class="modal-header" id="modalTitle">Video-Konfiguration</div>
+            <div class="form-group">
+                <div class="checkbox-group">
+                    <input type="checkbox" id="enableStreamerbot" onchange="updateStreamerbotStatus()">
+                    <label for="enableStreamerbot" style="margin-bottom: 0;">An Streamer.bot senden</label>
+                </div>
+            </div>
+
+            <div id="streamerbotOptionsDiv" style="display: none;">
+                <div class="form-group">
+                    <label>Zu übertragende Metadaten:</label>
+                    <div class="metadata-list" id="metadataList">
+                        <div class="checkbox-group" style="gap: 5px;">
+                            <input type="checkbox" id="meta-title" value="title"> <span>Titel</span>
+                        </div>
+                        <div class="checkbox-group" style="gap: 5px;">
+                            <input type="checkbox" id="meta-duration" value="duration"> <span>Dauer</span>
+                        </div>
+                        <div class="checkbox-group" style="gap: 5px;">
+                            <input type="checkbox" id="meta-filename" value="filename"> <span>Dateiname</span>
+                        </div>
+                        <div class="checkbox-group" style="gap: 5px;">
+                            <input type="checkbox" id="meta-custom" value="custom"> <span>Custom-Metadaten</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group" id="customMetadataDiv" style="display: none;">
+                    <label>Custom-Metadaten (JSON):</label>
+                    <textarea id="customMetadata" style="width: 100%; height: 120px; padding: 8px; background: #334155; border: 1px solid #475569; border-radius: 4px; color: #e2e8f0; font-family: monospace; font-size: 11px;">{"key": "value"}</textarea>
+                </div>
+            </div>
+
+            <button class="btn btn-primary" onclick="saveVideoConfig()" style="width: 100%; margin-top: 15px;">Speichern</button>
+            <button class="btn btn-modal-close" onclick="closeConfigModal()">Schließen</button>
+        </div>
+    </div>
+
+    <script>
+        let playlistItems = [];
+        let mediaLibrary = [];
+        let draggedIndex = -1;
+        let currentConfigIndex = -1;
+
+        async function loadPlaylist() {
+            try {
+                const response = await fetch('/api/playout/playlist');
+                const data = await response.json();
+                playlistItems = data.playlist || [];
+                renderPlaylist();
+                document.getElementById('status').style.display = 'none';
+            } catch (error) {
+                console.error('Fehler beim Laden:', error);
+            }
+        }
+
+        async function loadMediaLibrary() {
+            try {
+                const response = await fetch('/api/playout/media');
+                const data = await response.json();
+                mediaLibrary = data.media || [];
+            } catch (error) {
+                console.error('Fehler beim Laden der Media-Library:', error);
+            }
+        }
+
+        function openMediaSelector() {
+            loadMediaLibrary();
+            renderMediaGrid();
+            document.getElementById('mediaSelector').style.display = 'block';
+        }
+
+        function closeMediaSelector() {
+            document.getElementById('mediaSelector').style.display = 'none';
+        }
+
+        function renderMediaGrid() {
+            const grid = document.getElementById('mediaGrid');
+            grid.innerHTML = '';
+            
+            mediaLibrary.forEach((item, idx) => {
+                const div = document.createElement('div');
+                div.className = 'media-selector';
+                div.onclick = () => addMediaToPlaylist(item);
+                div.innerHTML = `
+                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect fill='%23334155' width='100' height='100'/%3E%3Ctext x='50' y='50' text-anchor='middle' dy='.3em' fill='%23cbd5e1' font-size='40'%3E🎬%3C/text%3E%3C/svg%3E" alt="Thumbnail">
+                    <div class="media-selector-name">${escapeHtml(item.name || item)}</div>
+                    <div class="media-selector-duration">${item.duration ? item.duration + 's' : 'Unbekannt'}</div>
+                `;
+                grid.appendChild(div);
+            });
+        }
+
+        function addMediaToPlaylist(item) {
+            const newItem = {
+                name: item.name || item,
+                path: item.path || item,
+                duration: item.duration || 0,
+                StreamerbotMetadata: {},
+                SendToStreamerbot: false
+            };
+            
+            playlistItems.push(newItem);
+            renderPlaylist();
+            closeMediaSelector();
+        }
+
+        function renderPlaylist() {
+            const list = document.getElementById('playlistList');
+            const empty = document.getElementById('emptyState');
+            
+            list.innerHTML = '';
+            
+            if (playlistItems.length === 0) {
+                empty.style.display = 'block';
+                return;
+            }
+            
+            empty.style.display = 'none';
+            
+            playlistItems.forEach((item, index) => {
+                const li = document.createElement('li');
+                li.className = 'playlist-item';
+                li.draggable = true;
+                li.dataset.index = index;
+                
+                // Extrahiere Namen korrekt
+                let videoName = item.MediaName || item.name || item.FilePath || 'Unbekannt';
+                let duration = item.DurationSeconds || item.duration || 0;
+                let streamerbotStatus = (item.SendToStreamerbot || item.sendToStreamerbot) ? '✓ Streamer.bot' : '○ Kein Streamer.bot';
+                
+                li.innerHTML = `
+                    <div class="playlist-item-thumbnail">
+                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect fill='%23334155' width='100' height='100'/%3E%3Ctext x='50' y='50' text-anchor='middle' dy='.3em' fill='%23cbd5e1' font-size='40'%3E🎬%3C/text%3E%3C/svg%3E" alt="Thumbnail">
+                    </div>
+                    <div class="playlist-item-info">
+                        <h3>${escapeHtml(videoName)}</h3>
+                        <div class="playlist-item-meta">
+                            <span>⏱️ ${duration}s</span>
+                            <span>${streamerbotStatus}</span>
+                        </div>
+                    </div>
+                    <div class="playlist-item-actions">
+                        ${index > 0 ? `<button class="btn btn-up" onclick="moveUp(${index})">▲</button>` : ''}
+                        ${index < playlistItems.length - 1 ? `<button class="btn btn-down" onclick="moveDown(${index})">▼</button>` : ''}
+                        <button class="btn btn-config" onclick="openConfigModal(${index})">⚙️</button>
+                        <button class="btn btn-delete" onclick="deleteItem(${index})">✕</button>
+                    </div>
+                `;
+                
+                li.addEventListener('dragstart', (e) => dragStart(e, index));
+                li.addEventListener('dragover', dragOver);
+                li.addEventListener('drop', (e) => drop(e, index));
+                li.addEventListener('dragend', dragEnd);
+                
+                list.appendChild(li);
+            });
+        }
+
+        function dragStart(e, index) {
+            draggedIndex = index;
+            e.target.closest('.playlist-item').classList.add('dragging');
+        }
+
+        function dragOver(e) {
+            e.preventDefault();
+            const item = e.target.closest('.playlist-item');
+            if (item) item.classList.add('drag-over');
+        }
+
+        function drop(e, targetIndex) {
+            e.preventDefault();
+            if (draggedIndex !== targetIndex && draggedIndex !== -1) {
+                const [draggedItem] = playlistItems.splice(draggedIndex, 1);
+                playlistItems.splice(targetIndex, 0, draggedItem);
+                renderPlaylist();
+            }
+        }
+
+        function dragEnd(e) {
+            document.querySelectorAll('.playlist-item').forEach(item => {
+                item.classList.remove('dragging', 'drag-over');
+            });
+        }
+
+        function moveUp(index) {
+            if (index > 0) {
+                [playlistItems[index], playlistItems[index - 1]] = [playlistItems[index - 1], playlistItems[index]];
+                renderPlaylist();
+            }
+        }
+
+        function moveDown(index) {
+            if (index < playlistItems.length - 1) {
+                [playlistItems[index], playlistItems[index + 1]] = [playlistItems[index + 1], playlistItems[index]];
+                renderPlaylist();
+            }
+        }
+
+        function deleteItem(index) {
+            if (confirm(`Löschen: ${playlistItems[index].name || playlistItems[index].FilePath}?`)) {
+                playlistItems.splice(index, 1);
+                renderPlaylist();
+            }
+        }
+
+        function openConfigModal(index) {
+            currentConfigIndex = index;
+            const item = playlistItems[index];
+            
+            document.getElementById('enableStreamerbot').checked = item.SendToStreamerbot || false;
+            document.getElementById('modalTitle').textContent = `Konfiguration: ${escapeHtml(item.name || item.FilePath || '')}`;
+            
+            updateStreamerbotStatus();
+            document.getElementById('configModal').classList.add('active');
+        }
+
+        function closeConfigModal() {
+            document.getElementById('configModal').classList.remove('active');
+        }
+
+        function updateStreamerbotStatus() {
+            const enabled = document.getElementById('enableStreamerbot').checked;
+            document.getElementById('streamerbotOptionsDiv').style.display = enabled ? 'block' : 'none';
+        }
+
+        function saveVideoConfig() {
+            if (currentConfigIndex === -1) return;
+            
+            const item = playlistItems[currentConfigIndex];
+            item.SendToStreamerbot = document.getElementById('enableStreamerbot').checked;
+            
+            if (item.SendToStreamerbot) {
+                const metadata = {};
+                document.querySelectorAll('#metadataList input[type="checkbox"]:checked').forEach(cb => {
+                    metadata[cb.value] = true;
+                });
+                item.StreamerbotMetadata = metadata;
+            }
+            
+            renderPlaylist();
+            closeConfigModal();
+        }
+
+        async function savePlaylist() {
+            try {
+                document.getElementById('toolbarStatus').innerHTML = 'Speichern...';
+                
+                const response = await fetch('/api/playout/updateplaylist', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ items: playlistItems })
+                });
+                
+                if (response.ok) {
+                    document.getElementById('toolbarStatus').innerHTML = '✓ Gespeichert!';
+                    setTimeout(() => closeEditor(), 1500);
+                } else {
+                    document.getElementById('toolbarStatus').innerHTML = '❌ Fehler beim Speichern';
+                }
+            } catch (error) {
+                document.getElementById('toolbarStatus').innerHTML = '❌ Fehler: ' + error.message;
+            }
+        }
+
+        function closeEditor() {
+            window.history.back();
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function exportPlaylist() {
+            try {
+                const dataStr = JSON.stringify({ playlist: playlistItems }, null, 2);
+                const dataBlob = new Blob([dataStr], { type: 'application/json' });
+                const url = URL.createObjectURL(dataBlob);
+                const link = document.createElement('a');
+                
+                const fileName = prompt('Dateiname (ohne .json):', `playlist_${new Date().toISOString().split('T')[0]}`);
+                if (!fileName) return;
+                
+                link.href = url;
+                link.download = `${fileName}.json`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+                
+                document.getElementById('toolbarStatus').textContent = '✓ Exportiert!';
+                setTimeout(() => document.getElementById('toolbarStatus').textContent = '', 3000);
+            } catch (error) {
+                alert('Fehler beim Exportieren: ' + error.message);
+            }
+        }
+
+        function triggerImport() {
+            document.getElementById('importFile').click();
+        }
+
+        function importPlaylist(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            try {
+                const reader = new FileReader();
+                reader.onload = async (e) => {
+                    const data = JSON.parse(e.target.result);
+                    
+                    if (!data.playlist || !Array.isArray(data.playlist)) {
+                        alert('Ungültige Dateiformat. Erwartet: { "playlist": [...] }');
+                        return;
+                    }
+                    
+                    playlistItems = data.playlist;
+                    renderPlaylist();
+                    document.getElementById('toolbarStatus').textContent = `✓ ${playlistItems.length} Videos importiert!`;
+                    setTimeout(() => document.getElementById('toolbarStatus').textContent = '', 3000);
+                };
+                reader.readAsText(file);
+            } catch (error) {
+                alert('Fehler beim Importieren: ' + error.message);
+            }
+            
+            // Reset file input
+            event.target.value = '';
+        }
+
+        // Playlist beim Laden
+        loadPlaylist();
+    </script>
+</body>
+</html>

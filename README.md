@@ -54,6 +54,31 @@
 - Einstellungen: Menü → "Einstellungen" → Verbindungsdetails (Host/Port)  
   - (EN) Settings: Menu → "Settings" → Connection details (host/port)
 
+## Playlist Editor / Playlist-Bearbeitung
+
+Der Playlist Editor ermöglicht es, die Reihenfolge der Videos in der Playlist interaktiv zu ändern.  
+(EN) The Playlist Editor allows you to interactively reorder videos in the playlist.
+
+### Web-GUI Playlist Editor
+- **Zugriff**: Klicken Sie auf "Playlist Editor" Button in der Hauptanwendung oder öffnen Sie: `http://localhost:5000/playout/editor`  
+  - (EN) Access: Click "Playlist Editor" button in main app or open: `http://localhost:5000/playout/editor`
+- **Features**:
+  - Ziehen und ablegen (Drag & Drop) zur Umordnung
+  - (EN) Drag & drop for reordering
+  - Hoch / Runter Buttons zur manuellen Bewegung
+  - (EN) Up / Down buttons for manual movement
+  - Löschen Button zum Entfernen von Videos
+  - (EN) Delete button to remove videos
+  - Speichern Button zum Aktualisieren der Playlist
+  - (EN) Save button to update the playlist
+
+### Desktop-GUI Playlist Editor (WPF)
+- **Zugriff**: "Playlist Editor" Menu in der WPF-Anwendung  
+  - (EN) Access: "Playlist Editor" menu in WPF app
+- **Funktionen**: Identisch zur Web-Variante mit systemeigener Windows-Integration
+  - (EN) Features: Identical to web version with native Windows integration
+
+
 ## Konfiguration / Configuration
 
 ### appsettings.json
@@ -119,6 +144,14 @@
 - ✅ Separate Log-Dateien  
   - (DE) `Logs/Log_core` und `Logs/Log_gui` mit Timestamp pro Session  
   - (EN) `Logs/Log_core` and `Logs/Log_gui` with per-session timestamps
+- ✅ REST API Endpoints  
+  - (DE) Vollständige HTTP-basierte API für Playout-Steuerung und Status-Abfragen  
+  - (EN) Complete HTTP-based API for playback control and status queries
+- ✅ Playlist Editor mit Drag & Drop  
+  - (DE) Web-GUI und WPF-Desktop-Anwendung zum Neuordnen der Playlist  
+  - (EN) web GUI and WPF desktop app for reordering playlist
+  - Features: Ziehen und Ablegen, Hoch-/Runter-Buttons, Löschen per Video
+  - (EN) Features: drag & drop, up/down buttons, delete per video
 - CasparCGProvider: Asynchrone Antwort-Verarbeitung via separaten Read-Task  
   - (EN) asynchronous response handling via a separate read task
 - Duration-basierte VideoEnded-Triggerung (Timer nach PLAY)  
@@ -161,8 +194,6 @@ Dieses Projekt ist noch in aktiver Entwicklung. Hier eine Liste geplanter Verbes
 ### Geplante Features / Planned Features
 - **Detaillierte Video-Duration**: Integration von FFmpeg für exakte Laufzeit-Berechnung anstatt Schätzung.  
   - (EN) Integrate FFmpeg for accurate video duration instead of estimation.
-- **Drag-and-Drop für Playlist**: Interaktive Reihenfolge-Änderung in der Web-UI.  
-  - (EN) Drag-and-drop for playlist reordering in web UI.
 - **Persistenz von Änderungen**: Automatisches Speichern der Playlist-Änderungen in `playlist.json`.  
   - (EN) Auto-save playlist changes to `playlist.json`.
 - **Mehr Provider**: Unterstützung für VLC, FFmpeg oder andere Playout-Systeme.  

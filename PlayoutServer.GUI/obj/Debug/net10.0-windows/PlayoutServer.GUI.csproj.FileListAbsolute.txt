@@ -6,7 +6,9 @@ D:\GitHub\Open-Playout-Server\PlayoutServer.GUI\bin\Debug\net10.0-windows\Playou
 D:\GitHub\Open-Playout-Server\PlayoutServer.GUI\bin\Debug\net10.0-windows\Newtonsoft.Json.dll
 D:\GitHub\Open-Playout-Server\PlayoutServer.GUI\bin\Debug\net10.0-windows\WatsonWebsocket.dll
 D:\GitHub\Open-Playout-Server\PlayoutServer.GUI\obj\Debug\net10.0-windows\PlayoutServer.GUI.csproj.AssemblyReference.cache
+D:\GitHub\Open-Playout-Server\PlayoutServer.GUI\obj\Debug\net10.0-windows\PlaylistEditorWindow.baml
 D:\GitHub\Open-Playout-Server\PlayoutServer.GUI\obj\Debug\net10.0-windows\MainWindow.g.cs
+D:\GitHub\Open-Playout-Server\PlayoutServer.GUI\obj\Debug\net10.0-windows\PlaylistEditorWindow.g.cs
 D:\GitHub\Open-Playout-Server\PlayoutServer.GUI\obj\Debug\net10.0-windows\App.g.cs
 D:\GitHub\Open-Playout-Server\PlayoutServer.GUI\obj\Debug\net10.0-windows\PlayoutServer.GUI_MarkupCompile.cache
 D:\GitHub\Open-Playout-Server\PlayoutServer.GUI\obj\Debug\net10.0-windows\PlayoutServer.GUI_MarkupCompile.lref

@@ -1,0 +1,6 @@
+[2026-03-22 17:58:58.599] [INFO] === Logging started for core (2026-03-22 17:58:58) ===
+[2026-03-22 17:58:58.608] [INFO] Program start
+[2026-03-22 17:58:58.827] [INFO] Lade Playlist von playlist.json
+[2026-03-22 17:58:58.840] [INFO] Gefundene Anzahl Playlisteinträge: 2
+[2026-03-22 17:58:58.851] [INFO] [PlayoutService] WebSocket Server nicht gestartet - nur Streamer.bot als Client Mode
+[2026-03-22 17:58:58.863] [INFO] [CasparCG] LS report returned 0 entries
