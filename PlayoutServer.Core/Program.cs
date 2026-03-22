@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using PlayoutServer.Core.Controllers;
 using PlayoutServer.Core.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -12,6 +13,7 @@ PlayoutServer.Core.Services.FileLogger.Log("Program start");
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+// WebSocketServer wird noch registriert aber nicht gestartet (nur für REST API)
 builder.Services.AddSingleton<WebSocketServer>();
 builder.Services.AddHostedService<PlayoutService>();
 

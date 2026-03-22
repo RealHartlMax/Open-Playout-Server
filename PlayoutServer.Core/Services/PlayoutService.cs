@@ -68,7 +68,9 @@ namespace PlayoutServer.Core.Services
                 await provider.ConnectAsync(config.PlayoutMode.Equals("OBS", StringComparison.OrdinalIgnoreCase) ? config.OBS.IP : config.CasparCG.IP,
                     config.PlayoutMode.Equals("OBS", StringComparison.OrdinalIgnoreCase) ? config.OBS.Port : config.CasparCG.Port).ConfigureAwait(false);
 
-                _wsServer.Start(config.WebSocketPort);
+                // WebSocketServer wird NICHT gestartet - nur noch Streamer.bot als Client
+                // _wsServer.Start(config.WebSocketPort);
+                FileLogger.Log("[PlayoutService] WebSocket Server nicht gestartet - nur Streamer.bot als Client Mode");
 
                 // Initialize Streamer.bot connector if enabled
                 if (config.StreamerbotEnabled)
@@ -81,15 +83,26 @@ namespace PlayoutServer.Core.Services
                     }
                     catch (Exception ex)
                     {
-                        FileLogger.Log($"[PlayoutService] Streamer.bot connection failed: {ex.Message}");
+                        FileLogger.LogError("[PlayoutService] Streamer.bot connection failed", ex);
                     }
                 }
 
                 using var playlistManager = new PlaylistManager(provider, _wsServer, playlist);
                 playlistManager.SetLoop(config.LoopEnabled);
 
+                // Register PlayoutController mit PlaylistManager für REST API
+                Controllers.PlayoutController.SetPlayoutManager(playlistManager, provider, _streamerbot);
+
                 // Initiale UI-Füllung: Playlist und Media laden (noch nicht starten)
-                await _wsServer.BroadcastAsync(new { eventType = "PLAYLIST_UPDATE", playlist = playlistManager.GetPlaylist() }).ConfigureAwait(false);
+                // WS Broadcasts sind optional - wenn kein Server läuft, werden sie ignoriert
+                try
+                {
+                    await _wsServer.BroadcastAsync(new { eventType = "PLAYLIST_UPDATE", playlist = playlistManager.GetPlaylist() }).ConfigureAwait(false);
+                }
+                catch (Exception ex)
+                {
+                    FileLogger.LogDebug($"WS Broadcast ignoriert (Server nicht gestartet): {ex.Message}");
+                }
 
                 try
                 {

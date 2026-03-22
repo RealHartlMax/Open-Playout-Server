@@ -1,0 +1,7 @@
+[2026-03-22 17:10:31.593] === GUI Logging started (2026-03-22 17:10:31) ===
+[2026-03-22 17:10:31.601] GUI start
+[2026-03-22 17:10:35.101] Einstellungen gespeichert: localhost:8080
+[2026-03-22 17:10:43.517] Versuche WebSocket-Verbindung zu öffnen: ws://localhost:8080/
+[2026-03-22 17:10:45.650] WebSocket verbunden
+[2026-03-22 17:10:45.667] WS empfangen: {"timestamp":"2026-03-22T17:10:45.651655+01:00","session":"34e57992052a4fafa1d7574253d9395e","request":"Hello","info":{"instanceId":"9075199e-3f35-45d8-a692-171263f3d1a8","name":"Streamer.bot","version":"1.0.4","os":"windows","osVersion":"6.2.9200.0","mode":"ui","darkMode":true,"source":"websocketServer"}}
+[2026-03-22 17:12:24.877] WebSocket getrennt

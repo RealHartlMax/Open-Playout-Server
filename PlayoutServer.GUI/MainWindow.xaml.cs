@@ -1,4 +1,10 @@
-﻿using System.Text;
+﻿using System;
+using System.Collections.Generic;
+using System.Net.Http;
+using System.Net.Http.Json;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -8,80 +14,162 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using WatsonWebsocket;
+using Newtonsoft.Json;
 
 namespace PlayoutServer.GUI;
 
 /// <summary>
-/// Interaction logic for MainWindow.xaml
+/// GUI für PlayoutServer mit REST API Client
 /// </summary>
 public partial class MainWindow : Window
 {
-    private WatsonWsClient? _wsClient;
-    private string _wsHost = "localhost";
-    private int _wsPort = 8080;
+    private HttpClient _httpClient = new();
+    private string _coreHost = "localhost";
+    private int _corePort = 5000;
+    private Timer? _statusUpdateTimer;
+    private bool _isConnected = false;
 
     public MainWindow()
     {
         InitializeComponent();
 
-        HostTextBox.Text = _wsHost;
-        PortTextBox.Text = _wsPort.ToString();
+        HostTextBox.Text = _coreHost;
+        PortTextBox.Text = _corePort.ToString();
+        
+        // Status auto-update every 2 seconds
+        _statusUpdateTimer = new Timer(UpdateStatusAsync, null, TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(2));
     }
 
     private void ConnectButton_Click(object sender, RoutedEventArgs e)
     {
-        if (_wsClient == null)
+        if (!_isConnected)
         {
             try
             {
-                if (!int.TryParse(PortTextBox.Text, out _wsPort))
+                if (!int.TryParse(PortTextBox.Text, out _corePort))
                 {
                     MessageBox.Show("Ungültiger Port.");
                     return;
                 }
 
-                _wsHost = string.IsNullOrWhiteSpace(HostTextBox.Text) ? "localhost" : HostTextBox.Text.Trim();
-                var wsUri = new Uri($"ws://{_wsHost}:{_wsPort}");
+                _coreHost = string.IsNullOrWhiteSpace(HostTextBox.Text) ? "localhost" : HostTextBox.Text.Trim();
+                
+                var baseUri = $"http://{_coreHost}:{_corePort}";
+                _httpClient.BaseAddress = new Uri(baseUri);
+                _isConnected = true;
 
-                FileLogger.Log($"Versuche WebSocket-Verbindung zu öffnen: {wsUri}");
-                _wsClient = new WatsonWsClient(wsUri);
-                _wsClient.MessageReceived += WsClient_MessageReceived;
-                _wsClient.ServerConnected += (s, args) =>
-                {
-                    Dispatcher.Invoke(() => StatusText.Text = "Verbunden");
-                    FileLogger.Log("WebSocket verbunden");
-                };
-                _wsClient.ServerDisconnected += (s, args) =>
-                {
-                    Dispatcher.Invoke(() => StatusText.Text = "Getrennt");
-                    FileLogger.Log("WebSocket getrennt");
-                };
-
-                _wsClient.Start();
+                FileLogger.Log($"[REST-Client] Verbinde mit Core: {baseUri}");
+                StatusText.Text = $"Verbunden mit {_coreHost}:{_corePort}";
                 ConnectButton.Content = "Trennen";
             }
             catch (Exception ex)
             {
-                FileLogger.Log($"Verbindungsfehler: {ex.Message}");
+                FileLogger.LogError("[REST-Client] Verbindungsfehler", ex);
                 MessageBox.Show($"Verbindungsfehler: {ex.Message}");
             }
         }
         else
         {
-            _wsClient.Stop();
-            _wsClient = null;
+            _isConnected = false;
+            _httpClient.BaseAddress = null;
             StatusText.Text = "Getrennt";
             ConnectButton.Content = "Verbinden";
-            FileLogger.Log("WebSocket getrennt durch Benutzer");
+            FileLogger.Log("[REST-Client] Getrennt durch Benutzer");
         }
     }
 
-    private void WsClient_MessageReceived(object? sender, MessageReceivedEventArgs e)
+    private async void UpdateStatusAsync(object? state)
     {
-        var message = Encoding.UTF8.GetString(e.Data);
-        FileLogger.Log($"WS empfangen: {message}");
-        Dispatcher.Invoke(() => EventsList.Items.Add(message));
+        if (!_isConnected || _httpClient.BaseAddress == null) return;
+
+        try
+        {
+            var response = await _httpClient.GetAsync("api/playout/status");
+            if (response.IsSuccessStatusCode)
+            {
+                var jsonContent = await response.Content.ReadAsStringAsync();
+                var status = JsonConvert.DeserializeObject<dynamic>(jsonContent);
+                
+                Dispatcher.Invoke(() =>
+                {
+                    try
+                    {
+                        var isRunning = (bool?)status?.isRunning ?? false;
+                        var currentIndex = (int?)status?.currentIndex ?? 0;
+                        var loopEnabled = (bool?)status?.loopEnabled ?? false;
+                        
+                        StatusText.Text = $"Status: {(isRunning ? "▶ Läuft" : "■ Gestoppt")} | Index: {currentIndex} | Loop: {(loopEnabled ? "✓" : "✗")}";
+                        FileLogger.LogDebug($"[REST-Status] Running={isRunning}, Index={currentIndex}");
+                    }
+                    catch { }
+                });
+            }
+        }
+        catch
+        {
+            // Silent - Connection könnte nicht verfügbar sein
+        }
+    }
+
+    private async void PlayButton_Click(object sender, RoutedEventArgs e) => await SendCommandAsync("play");
+    private async void StopButton_Click(object sender, RoutedEventArgs e) => await SendCommandAsync("stop");
+    private async void SkipButton_Click(object sender, RoutedEventArgs e) => await SendCommandAsync("skip");
+
+    private async Task SendCommandAsync(string command)
+    {
+        if (!_isConnected || _httpClient.BaseAddress == null)
+        {
+            MessageBox.Show("Nicht verbunden. Bitte zuerst Verbindung herstellen.");
+            return;
+        }
+
+        try
+        {
+            FileLogger.Log($"[REST-Command] Sende: {command}");
+            var response = await _httpClient.PostAsync($"api/playout/{command}", null);
+            
+            if (response.IsSuccessStatusCode)
+            {
+                var content = await response.Content.ReadAsStringAsync();
+                FileLogger.Log($"[REST-Command] OK: {command}");
+                EventsList.Items.Add($"[{DateTime.Now:HH:mm:ss}] {command.ToUpper()} ✓");
+            }
+            else
+            {
+                FileLogger.LogWarning($"[REST-Command] Error {response.StatusCode}: {command}");
+                MessageBox.Show($"Fehler: {response.StatusCode}");
+            }
+        }
+        catch (Exception ex)
+        {
+            FileLogger.LogError($"[REST-Command] {command}", ex);
+            MessageBox.Show($"Fehler: {ex.Message}");
+        }
+    }
+
+    private async void LoadMediaLibraryButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (!_isConnected || _httpClient.BaseAddress == null)
+        {
+            MessageBox.Show("Nicht verbunden.");
+            return;
+        }
+
+        try
+        {
+            FileLogger.Log("[REST-API] Lade Media Library...");
+            var response = await _httpClient.GetAsync("api/playout/media");
+            
+            if (response.IsSuccessStatusCode)
+            {
+                FileLogger.Log("[REST-API] Media Library erfolgreich geladen");
+                EventsList.Items.Add($"[{DateTime.Now:HH:mm:ss}] Media Library geladen ✓");
+            }
+        }
+        catch (Exception ex)
+        {
+            FileLogger.LogError("[REST-API] Media Library", ex);
+        }
     }
 
     private void OpenSettings_Click(object sender, RoutedEventArgs e)
@@ -91,33 +179,14 @@ public partial class MainWindow : Window
 
     private void SaveSettings_Click(object sender, RoutedEventArgs e)
     {
-        if (!int.TryParse(PortTextBox.Text, out _wsPort))
+        if (!int.TryParse(PortTextBox.Text, out int port))
         {
             SettingsStatus.Text = "Ungültiger Port.";
             return;
         }
 
-        _wsHost = string.IsNullOrWhiteSpace(HostTextBox.Text) ? "localhost" : HostTextBox.Text.Trim();
-        
-        SettingsStatus.Text = $"Einstellungen gespeichert: {_wsHost}:{_wsPort}";
-        FileLogger.Log(SettingsStatus.Text);
+        var host = string.IsNullOrWhiteSpace(HostTextBox.Text) ? "localhost" : HostTextBox.Text.Trim();
+        SettingsStatus.Text = $"Einstellungen gespeichert: {host}:{port}";
+        FileLogger.Log($"[Settings] Core: {host}:{port}");
     }
-
-    private void SendCommand(string command)
-    {
-        if (_wsClient != null && _wsClient.Connected)
-        {
-            var payload = $"{{\"command\":\"{command}\"}}";
-            FileLogger.Log($"Sende Befehl: {payload}");
-            _wsClient.SendAsync(Encoding.UTF8.GetBytes(payload));
-        }
-        else
-        {
-            FileLogger.Log($"Befehl nicht gesendet, WebSocket nicht verbunden: {command}");
-        }
-    }
-
-    private void PlayButton_Click(object sender, RoutedEventArgs e) => SendCommand("play");
-    private void StopButton_Click(object sender, RoutedEventArgs e) => SendCommand("stop");
-    private void SkipButton_Click(object sender, RoutedEventArgs e) => SendCommand("skip");
 }

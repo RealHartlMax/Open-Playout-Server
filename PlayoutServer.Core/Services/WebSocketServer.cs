@@ -1,6 +1,9 @@
 using System;
 using System.Collections.Concurrent;
+using System.Diagnostics;
+using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using PlayoutServer.Core.Services;
@@ -17,8 +20,10 @@ namespace PlayoutServer.Core.Services
     {
         private WatsonWsServer? _server;
         private readonly ConcurrentDictionary<string, bool> _clients = new();
+        private int _actualPort = -1;
 
         public bool IsRunning => _server != null;
+        public int ActualPort => _actualPort;
 
         // (DE) Event, wenn eine beliebige Rohnachricht empfangen wurde.
         // (EN) Event when any raw message is received.
@@ -110,16 +115,25 @@ namespace PlayoutServer.Core.Services
             };
             try
             {
+                var sw = Stopwatch.StartNew();
                 _server.Start();
-                var msg = $"WebSocket server started on ws://0.0.0.0:{port}";
+                sw.Stop();
+                _actualPort = port;
+
+                var msg = $"WebSocket server started on ws://0.0.0.0:{port} [{sw.ElapsedMilliseconds}ms]";
                 Console.WriteLine(msg);
-                FileLogger.Log(msg);
+                FileLogger.Log(msg, LogLevel.Info);
+                DiagnosticsService.RegisterService("WebSocketServer");
+                DiagnosticsService.LogConnectionSuccess("WebSocketServer", "1.0", $"port-{port}");
             }
             catch (Exception ex)
             {
+                _actualPort = -1;
                 var msg = $"WebSocket server failed to start on port {port}: {ex.Message}";
                 Console.WriteLine(msg);
-                FileLogger.Log(msg);
+                FileLogger.LogError(msg, ex);
+                DiagnosticsService.RegisterService("WebSocketServer");
+                DiagnosticsService.LogConnectionFailure("WebSocketServer", $"Failed to start on port {port}", ex);
                 _server = null;
             }
         }

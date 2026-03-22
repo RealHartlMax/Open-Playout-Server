@@ -7,6 +7,88 @@ und dieses Projekt folgt der [Semantic Versioning](https://semver.org/lang/de/).
 
 ---
 
+## [0.0.1b] - 2026-03-22
+
+**Hybrid-Architektur: REST API + Streamer.bot Integration**
+
+### Added
+- **REST API für Core (Port 5000)**
+  - `GET /api/playout/status` - Status & Playlist
+  - `POST /api/playout/play` - Video abspielen
+  - `POST /api/playout/stop` - Video stoppen
+  - `POST /api/playout/skip` - Zum nächsten Video springen
+  - `POST /api/playout/replay` - Video neu starten
+  - `POST /api/playout/loop?enabled=true|false` - Loop-Modus
+  - `GET /api/playout/playlist` - Aktuelle Playlist abrufen
+  - `GET /api/playout/media` - Media-Bibliothek abrufen
+  - `GET /api/playout/diagnostics` - Diagnostics-Report
+  - `GET /api/playout/health` - Health-Check
+
+- **Enhanced Logging-System**
+  - Log-Level-System: Debug, Info, Warning, Error, Critical
+  - Log-Level-Filtering (SetMinimumLogLevel)
+  - Spezielle Methoden: LogError(), LogWarning(), LogDebug()
+  - Millisekunden-Präzision in Timestamps
+
+- **DiagnosticsService**
+  - Service-Status-Tracking (Connected, Failed, Registered)
+  - Connection-Attempt-Zähler
+  - Response-Zeit-Messung
+  - Detailliertes Error-Tracking
+  - Health-Check: IsServiceHealthy()
+  - Diagnostics-Report-Generator
+
+- **GUI REST Client (HTTP-basiert)**
+  - HttpClient statt WatsonWebsocket
+  - Asynchrone REST-API-Requests zu Core
+  - Auto-Status-Updates (Timer alle 2 Sekunden)
+  - Service-Erkennung in Responses
+  - Verbindungs-Diagnostics
+  - GUI zeigt Connected/Disconnected Status
+
+### Changed
+- **Architektur-Umgestaltung (Client-Server-Modell)**
+  - WebSocketServer wird **nicht mehr gestartet** im Core
+  - Core läuft auf **Port 5000** (nicht 8080)
+  - GUI verbindet sich zu Core via **REST API** (nicht WebSocket)
+  - Streamer.bot läuft auf **Port 8081** (konfiguriert in appsettings.json)
+  - **Keine Port-Konflikte** mehr zwischen Core und Streamer.bot
+
+- **PlayoutService**
+  - WebSocket-Server-Start entfernt (\_wsServer.Start() kommentiert)
+  - PlayoutController registrierung mit PlaylistManager
+  - Streamer.bot bleibt als WebSocket-Client
+
+- **GUI Layout**
+  - Port-Default von 8080 zu 5000 geändert
+  - Label-Updates für REST API (nicht WebSocket)
+  - Status-Display mit Playback-Informationen
+  - Media-Library-Loading via REST API
+
+### Removed
+- WebSocketServer-Instanz aus PlayoutService (Server-Modus)
+- WatsonWebsocket-Dependencies aus GUI (neu: HttpClient)
+- WebSocket Command-Handler aus PlayoutService (nunmehr via REST)
+
+### Fixed
+- Port-Konflikt zwischen Core WebSocket (8080) und Streamer.bot (8081)
+- GUI zeigt jetzt korrekten Service-Namen bei Connection
+- REST API robuster gegen fehlende PlayoutManager-Initialisierung
+
+### Technical Details
+- **Port Allocation:**
+  - PlayoutServer.Core: `http://localhost:5000` (REST API)
+  - Streamer.bot: `ws://localhost:8081` (WebSocket Server)
+  - GUI: HTTP Client zum Core
+
+- **Communication Flow:**
+  - GUI → REST HTTP Requests → Core
+  - Core → CasparCG (AMCP/TCP)
+  - Core → Streamer.bot (WebSocket Events mit Metadaten)
+  - Streamer.bot → Actions (Trigger Stream Title, etc.)
+
+---
+
 ## [0.0.1] - 2026-03-22
 
 ### Added

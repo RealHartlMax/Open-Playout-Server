@@ -1,0 +1,6 @@
+[2026-03-22 17:07:12.197] === Logging started for core (2026-03-22 17:07:12) ===
+[2026-03-22 17:07:12.209] Program start
+[2026-03-22 17:07:12.609] Lade Playlist von playlist.json
+[2026-03-22 17:07:12.625] Gefundene Anzahl Playlisteinträge: 2
+[2026-03-22 17:07:12.834] WebSocket server failed to start on port 8080: Die Anforderung wird nicht unterstützt.
+[2026-03-22 17:07:12.855] [CasparCG] LS report returned 0 entries

@@ -1,0 +1,8 @@
+[2026-03-22 17:29:42.612] [INFO] === Logging started for core (2026-03-22 17:29:42) ===
+[2026-03-22 17:29:42.624] [INFO] Program start
+[2026-03-22 17:29:43.147] [INFO] Lade Playlist von playlist.json
+[2026-03-22 17:29:43.179] [INFO] Gefundene Anzahl Playlisteinträge: 2
+[2026-03-22 17:29:43.375] [ERROR] WebSocket server failed to start on port 8080: Die Anforderung wird nicht unterstützt. | Exception: HttpListenerException: Die Anforderung wird nicht unterstützt.
+[2026-03-22 17:29:43.385] [DEBUG] [DIAGNOSTICS] Service registered: WebSocketServer
+[2026-03-22 17:29:43.394] [WARNING] ✗ [DIAGNOSTICS] WebSocketServer connection failed: Failed to start on port 8080 (HttpListenerException: Die Anforderung wird nicht unterstützt.)
+[2026-03-22 17:29:43.410] [INFO] [CasparCG] LS report returned 0 entries
