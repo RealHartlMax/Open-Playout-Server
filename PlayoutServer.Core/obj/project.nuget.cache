@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "dgSpecHash": "lcCWJEjTx/g=",
+  "success": true,
+  "projectFilePath": "D:\\GitHub\\Open-Playout-Server\\PlayoutServer.Core\\PlayoutServer.Core.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\max\\.nuget\\packages\\newtonsoft.json\\13.0.4\\newtonsoft.json.13.0.4.nupkg.sha512",
+    "C:\\Users\\max\\.nuget\\packages\\watsonwebsocket\\4.1.8\\watsonwebsocket.4.1.8.nupkg.sha512"
+  ],
+  "logs": []
+}

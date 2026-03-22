@@ -1,0 +1,4 @@
+[
+  { "FilePath": "video1.mp4", "DurationSeconds": 30 },
+  { "FilePath": "video2.mp4", "DurationSeconds": 45 }
+]

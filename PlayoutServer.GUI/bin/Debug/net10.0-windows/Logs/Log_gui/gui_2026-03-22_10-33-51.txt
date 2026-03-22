@@ -1,0 +1,20 @@
+[2026-03-22 10:33:51.330] === GUI Logging started (2026-03-22 10:33:51) ===
+[2026-03-22 10:33:51.339] GUI start
+[2026-03-22 10:33:55.975] Einstellungen gespeichert: localhost:8080
+[2026-03-22 10:34:01.267] Versuche WebSocket-Verbindung zu öffnen: ws://localhost:8080/
+[2026-03-22 10:34:03.373] WebSocket verbunden
+[2026-03-22 10:34:03.383] WS empfangen: {"timestamp":"2026-03-22T10:34:03.3631096+01:00","session":"be2094ed135e44a4b70d251931b69f19","request":"Hello","info":{"instanceId":"9075199e-3f35-45d8-a692-171263f3d1a8","name":"Streamer.bot","version":"1.0.4","os":"windows","osVersion":"6.2.9200.0","mode":"ui","darkMode":true,"source":"websocketServer"}}
+[2026-03-22 10:34:03.390] WebSocket getrennt durch Benutzer
+[2026-03-22 10:34:03.411] WebSocket getrennt
+[2026-03-22 10:34:52.391] Befehl nicht gesendet, WebSocket nicht verbunden: play
+[2026-03-22 10:34:53.042] Befehl nicht gesendet, WebSocket nicht verbunden: stop
+[2026-03-22 10:34:53.532] Befehl nicht gesendet, WebSocket nicht verbunden: skip
+[2026-03-22 10:34:54.249] Versuche WebSocket-Verbindung zu öffnen: ws://localhost:8080/
+[2026-03-22 10:34:56.301] WebSocket verbunden
+[2026-03-22 10:34:56.309] WS empfangen: {"timestamp":"2026-03-22T10:34:56.3008857+01:00","session":"5c82c03578a6483c993a48a874678d71","request":"Hello","info":{"instanceId":"9075199e-3f35-45d8-a692-171263f3d1a8","name":"Streamer.bot","version":"1.0.4","os":"windows","osVersion":"6.2.9200.0","mode":"ui","darkMode":true,"source":"websocketServer"}}
+[2026-03-22 10:34:59.389] Sende Befehl: {"command":"play"}
+[2026-03-22 10:34:59.402] WS empfangen: { "error": "malformed command" }
+[2026-03-22 10:34:59.966] Sende Befehl: {"command":"stop"}
+[2026-03-22 10:34:59.975] WS empfangen: { "error": "malformed command" }
+[2026-03-22 10:35:01.621] Sende Befehl: {"command":"skip"}
+[2026-03-22 10:35:01.629] WS empfangen: { "error": "malformed command" }

@@ -1,0 +1,399 @@
+@{
+    ViewData["Title"] = "PlayoutServer Dashboard";
+}
+
+<style>
+    body {
+        font-family: Segoe UI, Arial, sans-serif;
+        background: #0c1017;
+        color: #e8edf4;
+        margin: 0;
+        padding: 0;
+    }
+
+    .layout {
+        display: grid;
+        height: 100vh;
+        grid-template-rows: auto 1fr auto;
+        grid-gap: 12px;
+        padding: 16px;
+    }
+
+    .topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+    }
+
+    .status {
+        border-radius: 10px;
+        padding: 10px 16px;
+        background: #18222f;
+        border: 1px solid #2f445c;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, .3);
+    }
+
+    .grid-wrapper {
+        display: grid;
+        grid-template-columns: 1fr 360px;
+        gap: 14px;
+    }
+
+    .panel {
+        background: #16202a;
+        border: 1px solid #2b4158;
+        border-radius: 12px;
+        padding: 14px;
+        box-shadow: 0 3px 14px rgba(0,0,0,.30);
+    }
+
+    .panel h2 {
+        margin-top: 0;
+        font-size: 1.1rem;
+        color: #88bdee;
+    }
+
+    .timeline {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+    }
+
+    .button {
+        border: none;
+        cursor: pointer;
+        border-radius: 8px;
+        background: #2c4e76;
+        color: #fff;
+        padding: 8px 14px;
+        font-size: 0.95rem;
+        transition: transform .13s ease, background .2s ease;
+    }
+
+    .button:hover { background: #3f6fa7; transform: translateY(-2px); }
+
+    .events {
+        height: calc(100vh - 210px);
+        overflow-y: auto;
+        border: 1px solid #2c455d;
+        border-radius: 10px;
+        background: #0f1721;
+        padding: 8px;
+    }
+
+    .events p { margin: 6px 0; font-size: .92rem; }
+
+    .alert-error { color: #ff7f7f; }
+    .alert-success { color: #79ff9c; }
+</style>
+
+<div class="layout">
+    <div class="topbar">
+        <h1>PlayoutServer Dashboard</h1>
+        <div id="status" class="status">WebSocket: verbindungsaufbau…</div>
+    </div>
+
+    <div class="grid-wrapper">
+        <div class="panel">
+            <div class="timeline">
+                <div>
+                    <h2>Aktuelles Video</h2>
+                    <div id="currentItem">--</div>
+                </div>
+                <div>
+                    <h2>Next</h2>
+                    <div id="nextItem">--</div>
+                </div>
+                <div>
+                    <h2>Zustand</h2>
+                    <div id="playbackState">idle</div>
+                </div>
+                <div>
+                    <h2>Loop</h2>
+                    <div id="loopState">on</div>
+                </div>
+                <div>
+                    <h2>Laufzeit</h2>
+                    <div id="timeInfo">00:00 / 00:00</div>
+                    <div>Verbleibend: <span id="remainingInfo">00:00</span></div>
+                    <div>Anzeige: <span id="displayMode">ms</span> <button class="button" onclick="toggleDisplayMode()">ms/frames</button></div>
+                </div>
+            </div>
+
+            <div style="margin-top:12px; display:flex; gap:6px; align-items:center;">
+                <button class="button" onclick="sendCommand('play')">▶ PLAY</button>
+                <button class="button" onclick="sendCommand('stop')">■ STOP</button>
+                <button class="button" onclick="sendCommand('next')">⏭ NEXT</button>
+                <button class="button" onclick="sendCommand('toggleloop')">↺ Toggle Loop</button>
+                <button class="button" onclick="sendCommand('reload')">⟳ Reload</button>
+                <button class="button" onclick="savePlaylist()">💾 Save Playlist</button>
+            </div>
+        </div>
+
+        <div class="panel">
+            <h2>Events</h2>
+            <div id="events" class="events"></div>
+        </div>
+    </div>
+
+    <div class="panel">
+        <h2>Playlist</h2>
+        <table style="width:100%; border-collapse:collapse;">
+            <thead>
+                <tr style="color:#a9b8cc; text-align:left;"><th>#</th><th>Aktiv</th><th>Datei</th><th>Dauer</th><th>Status</th><th>Aktionen</th></tr>
+            </thead>
+            <tbody id="playlist"></tbody>
+        </table>
+    </div>
+
+    <div class="panel">
+        <h2>Media Library</h2>
+        <div style="margin-bottom:10px;">
+            <button class="button" onclick="scanMedia()">🔍 Scan Media</button>
+            <button class="button" onclick="toggleViewMode()">📋 List / 🖼️ Thumbnails</button>
+        </div>
+        <div id="mediaLibrary" style="max-height:400px; overflow-y:auto;"></div>
+    </div>
+</div>
+
+<script>
+    const status = document.getElementById('status');
+    const events = document.getElementById('events');
+    const currentItem = document.getElementById('currentItem');
+    const nextItem = document.getElementById('nextItem');
+    const playbackState = document.getElementById('playbackState');
+    const playlistEl = document.getElementById('playlist');
+    let ws;
+
+    function connectWs() {
+        ws = new WebSocket('ws://localhost:8080');
+
+        ws.onopen = () => {
+            status.innerText = 'WebSocket verbunden';
+            status.style.color = '#75f58e';
+            replayPlaylist();
+        };
+
+        ws.onmessage = (ev) => {
+            const d = JSON.parse(ev.data);
+            logEvent(d);
+
+            if (d.eventType === 'VIDEO_STARTED') {
+                playbackState.innerText = 'playing';
+                currentItem.innerText = d.file;
+                currentDurationMs = (d.duration || 0) * 1000;
+                currentProgressMs = 0;
+                updateTimeInfo();
+            }
+            if (d.eventType === 'VIDEO_PROGRESS') {
+                currentProgressMs = d.elapsedMs || 0;
+                currentDurationMs = d.durationMs || currentDurationMs;
+                updateTimeInfo();
+            }
+            if (d.eventType === 'VIDEO_ENDED') {
+                playbackState.innerText = 'idle';
+                currentProgressMs = currentDurationMs;
+                updateTimeInfo();
+            }
+            if (d.eventType === 'PLAYLIST_UPDATE') {
+                renderPlaylist(d.playlist);
+            }
+            if (d.eventType === 'MEDIA_LIBRARY_UPDATE') {
+                renderMediaLibrary(d.media);
+            }
+            if (d.eventType === 'VIDEO_ERROR') {
+                playbackState.innerText = 'error';
+                events.innerHTML += `<p class='alert-error'>${d.error}</p>`;
+            }
+            if (d.eventType === 'LOOP_STATE') {
+                loopState.innerText = d.enabled ? 'on' : 'off';
+                events.innerHTML += `<p style='color:#fbbc40;margin:2px 0;'>Loop ${d.enabled ? 'aktiviert' : 'deaktiviert'}</p>`;
+            }
+            if (d.eventType === 'PLAYBACK_COMPLETED') {
+                playbackState.innerText = 'completed';
+                events.innerHTML += `<p style='color:#8be1ff;margin:2px 0;'>Playlist abgeschlossen.</p>`;
+            }
+        };
+
+        ws.onclose = () => {
+            status.innerText = 'WebSocket getrennt';
+            status.style.color = '#f5635d';
+            setTimeout(connectWs, 2500);
+        };
+        ws.onerror = () => {
+            status.innerText = 'WebSocket Fehler';
+            status.style.color = '#ff7f7f';
+        };
+    }
+
+    function sendCommand(cmd) {
+        if (ws && ws.readyState === 1) {
+            ws.send(JSON.stringify({ command: cmd }));
+        }
+    }
+
+    let currentProgressMs = 0;
+    let currentDurationMs = 0;
+    let displayMode = 'ms';
+    let defaultFrameRate = 25;
+
+    function logEvent(data) {
+        let color = 'white';
+        if (data.eventType === 'VIDEO_ENDED') color = '#8be1ff';
+        if (data.eventType === 'VIDEO_STARTED') color = '#b7ff8f';
+        if (data.eventType === 'VIDEO_ERROR') color = '#ff7f7f';
+
+        events.innerHTML = `<p style='color:${color}; margin:2px 0;'>${new Date().toLocaleTimeString()} · ${data.eventType} · ${data.file || ''}</p>` + events.innerHTML;
+    }
+
+    function formatMs(ms) {
+        const totalSeconds = Math.floor(ms / 1000);
+        const m = Math.floor(totalSeconds / 60).toString().padStart(2, '0');
+        const s = (totalSeconds % 60).toString().padStart(2, '0');
+        const hundred = Math.floor((ms % 1000) / 10).toString().padStart(2, '0');
+        return `${m}:${s}.${hundred}`;
+    }
+
+    function formatFrames(ms) {
+        const frames = Math.round((ms / 1000) * defaultFrameRate);
+        return `${frames} frames (${defaultFrameRate} fps)`;
+    }
+
+    function updateTimeInfo() {
+        if (!currentDurationMs || currentDurationMs <= 0) return;
+
+        const remainingMs = Math.max(0, currentDurationMs - currentProgressMs);
+        const elapsed = currentProgressMs;
+
+        if (displayMode === 'frames') {
+            const elapsedFrames = formatFrames(elapsed);
+            const remainingFrames = formatFrames(remainingMs);
+            timeInfo.innerText = `${elapsedFrames} / ${formatFrames(currentDurationMs)}`;
+            remainingInfo.innerText = remainingFrames;
+        } else {
+            timeInfo.innerText = `${formatMs(elapsed)} / ${formatMs(currentDurationMs)}`;
+            remainingInfo.innerText = formatMs(remainingMs);
+        }
+    }
+
+    function toggleDisplayMode() {
+        displayMode = displayMode === 'ms' ? 'frames' : 'ms';
+        displayModeElem = document.getElementById('displayMode');
+        if (displayModeElem) displayModeElem.innerText = displayMode;
+        updateTimeInfo();
+    }
+
+    function replayPlaylist() {
+        ws.send(JSON.stringify({ command: 'playlist' }));
+    }
+
+    let playlistData = [];
+    let mediaData = [];
+    let viewMode = 'list'; // 'list' or 'thumbnails'
+
+    function renderPlaylist(pl) {
+        playlistData = pl || [];
+        playlistEl.innerHTML = '';
+        playlistData.forEach((item, idx) => {
+            const fileName = item.fileName || item.FileName || item.filePath || item.FilePath || 'Unknown';
+            const duration = item.durationSeconds || item.DurationSeconds || 0;
+            const enabled = item.enabled ?? item.Enabled ?? true;
+            const status = item.status || item.Status || 'queued';
+
+            playlistEl.innerHTML += `
+                <tr>
+                    <td>${idx + 1}</td>
+                    <td><input type="checkbox" ${enabled ? 'checked' : ''} onchange="setItemEnabled(${idx}, this.checked)"></td>
+                    <td>${fileName}</td>
+                    <td>${duration}s</td>
+                    <td>${status}</td>
+                    <td>
+                        <button onclick="moveUp(${idx})">↑</button>
+                        <button onclick="moveDown(${idx})">↓</button>
+                        <button onclick="removeItem(${idx})">✖</button>
+                    </td>
+                </tr>`;
+        });
+    }
+
+    function setItemEnabled(index, enabled) {
+        if (playlistData && playlistData[index]) {
+            playlistData[index].enabled = enabled;
+        }
+    }
+
+    function moveUp(index) {
+        if (index > 0) {
+            [playlistData[index - 1], playlistData[index]] = [playlistData[index], playlistData[index - 1]];
+            renderPlaylist(playlistData);
+        }
+    }
+
+    function moveDown(index) {
+        if (index < playlistData.length - 1) {
+            [playlistData[index + 1], playlistData[index]] = [playlistData[index], playlistData[index + 1]];
+            renderPlaylist(playlistData);
+        }
+    }
+
+    function removeItem(index) {
+        playlistData.splice(index, 1);
+        renderPlaylist(playlistData);
+    }
+
+    function savePlaylist() {
+        if (ws && ws.readyState === 1) {
+            ws.send(JSON.stringify({ command: 'updateplaylist', items: playlistData }));
+            events.innerHTML += `<p style='color:#88d2ff;margin:2px 0;'>Playlist gesendet.</p>` + events.innerHTML;
+        }
+    }
+
+    function scanMedia() {
+        if (ws && ws.readyState === 1) {
+            ws.send(JSON.stringify({ command: 'scanmedia' }));
+        }
+    }
+
+    function toggleViewMode() {
+        viewMode = viewMode === 'list' ? 'thumbnails' : 'list';
+        renderMediaLibrary(mediaData);
+    }
+
+    function renderMediaLibrary(media) {
+        mediaData = media || [];
+        const container = document.getElementById('mediaLibrary');
+        container.innerHTML = '';
+
+        if (viewMode === 'list') {
+            container.innerHTML = '<table style="width:100%; border-collapse:collapse;"><thead><tr style="color:#a9b8cc;"><th>Datei</th><th>Größe</th><th>Dauer</th><th>Aktion</th></tr></thead><tbody id="mediaTable"></tbody></table>';
+            const tbody = document.getElementById('mediaTable');
+            mediaData.forEach(item => {
+                tbody.innerHTML += `<tr><td>${item.fileName}</td><td>${item.sizeFormatted}</td><td>${item.durationFormatted}</td><td><button onclick="addToPlaylist('${item.filePath}', ${item.durationSeconds})">+</button></td></tr>`;
+            });
+        } else {
+            mediaData.forEach(item => {
+                container.innerHTML += `
+                    <div style="display:inline-block; margin:5px; text-align:center; border:1px solid #2b4158; padding:5px; background:#16202a;">
+                        <div>📹 ${item.fileName}</div>
+                        <div>${item.sizeFormatted}</div>
+                        <div>${item.durationFormatted}</div>
+                        <button onclick="addToPlaylist('${item.filePath}', ${item.durationSeconds})">+</button>
+                    </div>`;
+            });
+        }
+    }
+
+    function addToPlaylist(filePath, duration) {
+        const newItem = {
+            filePath: filePath,
+            durationSeconds: duration,
+            enabled: true,
+            status: 'queued'
+        };
+        playlistData.push(newItem);
+        renderPlaylist(playlistData);
+    }
+
+    connectWs();
+</script>

@@ -1,0 +1,6 @@
+[2026-03-22 10:20:21.280] === GUI Logging started (2026-03-22 10:20:21) ===
+[2026-03-22 10:20:21.287] GUI start
+[2026-03-22 10:20:26.077] Versuche WebSocket-Verbindung zu öffnen
+[2026-03-22 10:20:40.374] Befehl nicht gesendet, WebSocket nicht verbunden: play
+[2026-03-22 10:20:42.139] Befehl nicht gesendet, WebSocket nicht verbunden: stop
+[2026-03-22 10:20:42.849] Befehl nicht gesendet, WebSocket nicht verbunden: skip

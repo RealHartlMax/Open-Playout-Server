@@ -1,0 +1,4 @@
+[2026-03-22 10:26:01.919] === GUI Logging started (2026-03-22 10:26:01) ===
+[2026-03-22 10:26:01.927] GUI start
+[2026-03-22 10:26:05.454] Befehl nicht gesendet, WebSocket nicht verbunden: play
+[2026-03-22 10:26:06.643] Versuche WebSocket-Verbindung zu öffnen

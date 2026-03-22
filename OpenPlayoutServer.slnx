@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="PlayoutServer.Core/PlayoutServer.Core.csproj" />
+  <Project Path="PlayoutServer.GUI/PlayoutServer.GUI.csproj" />
+</Solution>
